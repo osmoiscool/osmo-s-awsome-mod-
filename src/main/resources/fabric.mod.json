@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "oam",
+  "version": "${mod_version}",
+  "name": "OAM",
+  "description": "Osmo's Awesome Mod - Fast Leap (ported from FATbaby)",
+  "authors": ["osmo"],
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      { "adapter": "kotlin", "value": "com.oam.OAM" }
+    ]
+  },
+  "mixins": ["oam.mixins.json"],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": ">=${minecraft_version}",
+    "fabric-language-kotlin": ">=${fabric_kotlin_version}"
+  }
+}

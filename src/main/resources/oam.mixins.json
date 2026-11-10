@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "package": "com.oam.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "MixinConnection",
+    "MixinInventory",
+    "accessors.IConnectionAccessor",
+    "accessors.IInventoryAccessor"
+  ],
+  "client": [
+    "MixinMouseHandler",
+    "MixinHud",
+    "MixinFirstPersonHandsAndItems",
+    "MixinMultiPlayerGameMode",
+    "MixinClientPacketListener",
+    "accessors.IMultiPlayerGameModeAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
