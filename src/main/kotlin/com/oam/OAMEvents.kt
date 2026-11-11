@@ -5,6 +5,7 @@ import com.oam.features.FastLeap
 import com.oam.features.LeapHelper
 import com.oam.features.LeapRotationFix
 import net.minecraft.network.protocol.game.ClientboundMapItemDataPacket
+import com.oam.utils.ContainerData
 import com.oam.utils.Dungeon
 import com.oam.utils.mc
 import com.oam.utils.removeFormatting
@@ -37,11 +38,15 @@ object OAMEvents {
             val lines = packet.entries().mapNotNull { it.displayName?.string }
             if (lines.isNotEmpty()) Dungeon.onTabUpdate(lines)
         }
-        return LeapHelper.onPacketReceive(packet)
+        val loaded = ContainerData.onPacketReceive(packet)
+        val cancel = LeapHelper.onPacketReceive(packet)
+        if (loaded) LeapHelper.onContainerLoaded(ContainerData.windowId)
+        return cancel
     }
 
     @JvmStatic
     fun onPacketSend(packet: Packet<*>) {
         LeapHelper.onPacketSend(packet)
+        ContainerData.onPacketSend(packet)
     }
 }

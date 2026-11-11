@@ -1,12 +1,11 @@
 package com.oam.features
 
-import com.oam.utils.Scheduler
+import com.oam.utils.ContainerData
 import com.oam.utils.doPacketInteract
 import com.oam.utils.mc
 import com.oam.utils.modMessage
 import com.oam.utils.removeFormatting
 import com.oam.utils.sendPacketDirect
-import com.oam.utils.sendWindowClick
 import com.oam.utils.skyblockId
 import com.oam.utils.swapSlot
 import net.minecraft.network.protocol.Packet
@@ -15,6 +14,7 @@ import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket
+import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.item.ItemStack
 
 object LeapHelper {
@@ -24,8 +24,10 @@ object LeapHelper {
     @Volatile private var clickedAt = 0L
     @Volatile private var menuOpened = false
     @Volatile private var windowId = -1
-    @Volatile private var stateId = 0
 
+    private class PendingLeap(val name: String, val useSpiritLeapWhenRequired: Boolean)
+
+    @Volatile private var pendingLeap: PendingLeap? = null
     @Volatile private var autoPending = false
     @Volatile private var lastAutoLeap = 0L
 
@@ -83,38 +85,37 @@ object LeapHelper {
         if (System.currentTimeMillis() - lastAutoLeap < 500L) return
         if (busy()) return
 
+        pendingLeap = PendingLeap(name, useSpiritLeapWhenRequired)
+        autoPending = true
+        lastAutoLeap = System.currentTimeMillis()
+    }
+
+    fun onTickStart() {
+        val pending = pendingLeap ?: return
+        pendingLeap = null
+        autoPending = false
+
         var leapSlot = findLeap()
-        if (useSpiritLeapWhenRequired && infinileapOnCooldown() && !spiritLeapOnCooldown()) {
+        if (pending.useSpiritLeapWhenRequired && infinileapOnCooldown() && !spiritLeapOnCooldown()) {
             val spiritSlot = findSpiritLeap()
             if (spiritSlot >= 0) leapSlot = spiritSlot
         }
         if (leapSlot < 0) return
+        if (!SilentSwap.swapNow(leapSlot, "Leaping")) return
 
-        target = name
-        autoPending = true
-        lastAutoLeap = System.currentTimeMillis()
-
-        Scheduler.afterTicks(0) {
-            val scheduled = SilentSwap.useSlot(leapSlot, "Leaping") {
-                autoPending = false
-                clickedLeap = true
-                clickedAt = System.currentTimeMillis()
-                doPacketInteract()
-            }
-            if (!scheduled) {
-                autoPending = false
-                target = null
-            }
-        }
+        target = pending.name
+        clickedLeap = true
+        clickedAt = System.currentTimeMillis()
+        doPacketInteract()
     }
 
     fun reset() {
         menuOpened = false
         target = null
         clickedLeap = false
+        pendingLeap = null
         autoPending = false
         windowId = -1
-        stateId = 0
     }
 
     fun onTick() {
@@ -149,11 +150,8 @@ object LeapHelper {
 
     fun onPacketReceive(packet: Packet<*>): Boolean = when (packet) {
         is ClientboundOpenScreenPacket -> onOpenScreen(packet)
-        is ClientboundContainerSetSlotPacket -> {
-            if (packet.containerId == windowId) stateId = packet.stateId
-            onSlot(packet.containerId, packet.slot, packet.item)
-        }
-        is ClientboundContainerSetContentPacket -> onContent(packet)
+        is ClientboundContainerSetSlotPacket -> hidingMenu(packet.containerId)
+        is ClientboundContainerSetContentPacket -> hidingMenu(packet.containerId)
         is ClientboundContainerClosePacket -> {
             menuOpened = false
             false
@@ -182,42 +180,33 @@ object LeapHelper {
         clickedLeap = false
         menuOpened = true
         windowId = packet.containerId
-        stateId = 0
 
         return target != null
     }
 
-    private fun onContent(packet: ClientboundContainerSetContentPacket): Boolean {
-        if (target == null || !menuOpened || packet.containerId != windowId) return false
-        stateId = packet.stateId
-        for ((slot, item) in packet.items.withIndex()) {
-            if (target == null) break
-            onSlot(packet.containerId, slot, item)
-        }
-        return true
-    }
+    private fun hidingMenu(containerId: Int): Boolean =
+        target != null && menuOpened && containerId == windowId && windowId > 0
 
-    private fun onSlot(containerId: Int, slot: Int, item: ItemStack): Boolean {
-        val target = target ?: return false
-        if (!menuOpened || containerId != windowId || windowId <= 0) return false
-        if (item.isEmpty || slot == 0) return false
+    fun onContainerLoaded(containerId: Int) {
+        val target = target ?: return
+        if (!menuOpened || containerId != windowId || windowId <= 0) return
 
-        if (slot > 35) {
-            modMessage("&7Could not find &b$target")
-            sendPacketDirect(ServerboundContainerClosePacket(windowId))
-            mc.execute { reset() }
+        for (slot in 1..35) {
+            val item = ContainerData.slots[slot] ?: continue
+            if (item.isEmpty) continue
+            if (item.hoverName.string.removeFormatting().lowercase() != target.lowercase()) continue
+
+            LeapRotationFix.onHiddenClick(slot, item)
+            ContainerData.windowClick(slot, ContainerInput.CLONE)
+            modMessage("&7Leaping to &b$target")
             this.target = null
-            return true
+            mc.execute { reset() }
+            return
         }
 
-        val name = item.hoverName.string.removeFormatting().lowercase()
-        if (name != target.lowercase()) return true
-
-        LeapRotationFix.onHiddenClick(slot, item)
-        sendWindowClick(windowId, stateId, slot)
-        modMessage("&7Leaping to &b$target")
+        modMessage("&7Could not find &b$target")
+        sendPacketDirect(ServerboundContainerClosePacket(windowId))
         this.target = null
         mc.execute { reset() }
-        return true
     }
 }

@@ -16,7 +16,7 @@ object AutoLeap {
 
     private fun leapTo(target: String) {
         if (target.isBlank()) return
-        mc.execute { LeapHelper.autoLeap(LeapTarget.resolve(target)) }
+        LeapHelper.autoLeap(LeapTarget.resolve(target))
     }
 
     fun onWorldChange() {
@@ -52,9 +52,7 @@ object AutoLeap {
 
         LeapTarget.doorOpener = opener
 
-        if (config.brAuto) mc.execute {
-            LeapHelper.autoLeap(opener, useSpiritLeapWhenRequired = config.brUseSpiritLeap)
-        }
+        if (config.brAuto) LeapHelper.autoLeap(opener, useSpiritLeapWhenRequired = config.brUseSpiritLeap)
     }
 
     private val progressRegex = Regex("""(\w+) (activated|completed) (a terminal|a device|a lever)! \((\d)/(\d)\)""")
@@ -115,10 +113,10 @@ object AutoLeap {
         if (!config.p3Auto) return
 
         val target = when (finished) {
-            1 -> if (Dungeon.inRegion("s1")) config.s1Target else null
-            2 -> if (Dungeon.inRegion("s2")) config.s2Target else null
-            3 -> if (Dungeon.inRegion("s3")) config.s3Target else null
-            4 -> if (Dungeon.inRegion("s4")) config.s4Target else null
+            1 -> if (Dungeon.inRegion("s1")) config.profile.s1Target else null
+            2 -> if (Dungeon.inRegion("s2")) config.profile.s2Target else null
+            3 -> if (Dungeon.inRegion("s3")) config.profile.s3Target else null
+            4 -> if (Dungeon.inRegion("s4")) config.profile.s4Target else null
             else -> null
         } ?: return
 
@@ -132,7 +130,7 @@ object AutoLeap {
         val name = relicRegex.find(message)?.groupValues?.get(1) ?: return
         if (name != mc.player?.name?.string) return
 
-        val target = config.p5Target
+        val target = config.profile.p5Target
         Scheduler.afterMs(config.p5AutoDelay.coerceIn(0, 500).toLong()) { leapTo(target) }
     }
 

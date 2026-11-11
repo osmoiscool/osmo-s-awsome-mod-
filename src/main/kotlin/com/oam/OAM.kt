@@ -8,6 +8,7 @@ import com.oam.features.SilentSwap
 import com.oam.utils.Scheduler
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import com.oam.gui.OAMScreen
+import com.oam.utils.ContainerData
 import com.oam.utils.Dungeon
 import com.oam.utils.mc
 import com.oam.utils.modMessage
@@ -31,12 +32,15 @@ object OAM : ClientModInitializer {
             LeapRotationFix.onWorldChange()
             LeapHelper.reset()
             SilentSwap.reset()
+            ContainerData.reset()
         }
 
         ClientTickEvents.START_CLIENT_TICK.register {
             if (mc.player == null) return@register
+            Dungeon.onTick()
             Scheduler.onTickStart()
             SilentSwap.onTickStart()
+            LeapHelper.onTickStart()
         }
 
         ClientTickEvents.END_CLIENT_TICK.register {

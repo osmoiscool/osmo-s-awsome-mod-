@@ -1,40 +1,17 @@
 package com.oam.utils
 
-import com.google.common.primitives.Shorts
-import com.google.common.primitives.SignedBytes
 import com.oam.features.LeapHelper
 import com.oam.mixin.accessors.IConnectionAccessor
 import com.oam.mixin.accessors.IMultiPlayerGameModeAccessor
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
-import net.minecraft.network.HashedStack
 import net.minecraft.network.protocol.Packet
-import net.minecraft.network.protocol.game.ServerboundContainerClickPacket
 import net.minecraft.network.protocol.game.ServerboundUseItemPacket
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
-import net.minecraft.world.inventory.ContainerInput
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.GameType
 
 fun sendPacketDirect(packet: Packet<*>) {
     val connection = mc.connection?.connection ?: return
     (connection as IConnectionAccessor).channel.eventLoop().execute { connection.send(packet) }
-}
-
-fun sendWindowClick(windowId: Int, stateId: Int, slot: Int) {
-    val listener = mc.connection ?: return
-    val hashGenerator = listener.decoratedHashOpsGenenerator()
-
-    val packet = ServerboundContainerClickPacket(
-        windowId,
-        stateId,
-        Shorts.checkedCast(slot.toLong()),
-        SignedBytes.checkedCast(0L),
-        ContainerInput.CLONE,
-        Int2ObjectOpenHashMap<HashedStack>(),
-        HashedStack.create(ItemStack.EMPTY, hashGenerator)
-    )
-    sendPacketDirect(packet)
 }
 
 fun swapSlot(slot: Int): Boolean {

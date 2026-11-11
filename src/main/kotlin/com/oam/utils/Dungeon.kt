@@ -35,7 +35,14 @@ object Dungeon {
 
     fun currentRegions(): List<String> = regions.filterValues { it.containsPlayer() }.keys.toList()
 
+    @Volatile
+    var stormCrushed = false
+        private set
+
     fun onChat(message: String) {
+        if (message.contains("[BOSS] Storm: Oof") || message.contains("[BOSS] Storm: Ouch, that hurt!")) {
+            stormCrushed = true
+        }
         phase = when (message) {
             "[BOSS] Maxor: WELL! WELL! WELL! LOOK WHO'S HERE!" -> 1
             "[BOSS] Storm: Pathetic Maxor, just like expected." -> 2
@@ -48,6 +55,7 @@ object Dungeon {
 
     fun onWorldChange() {
         phase = 0
+        stormCrushed = false
         partyCache.clear()
     }
 
@@ -64,11 +72,11 @@ object Dungeon {
         for (line in lines) parseInto(line, partyCache)
     }
 
-    fun party(): Map<String, String> {
-        val result = synchronized(partyCache) { LinkedHashMap(partyCache) }
-        for (line in tabLines()) parseInto(line, result)
-        return result
+    fun onTick() {
+        for (line in tabLines()) parseInto(line, partyCache)
     }
+
+    fun party(): Map<String, String> = synchronized(partyCache) { LinkedHashMap(partyCache) }
 
     fun getNameByClass(query: String): String? {
         val q = query.trim().lowercase()

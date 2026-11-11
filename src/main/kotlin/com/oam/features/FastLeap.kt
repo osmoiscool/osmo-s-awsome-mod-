@@ -18,7 +18,7 @@ object FastLeap {
             return false
         }
 
-        if (!OAMConfig.settings.fastLeap) return false
+        if (!OAMConfig.settings.profile.fastLeap) return false
         if (button != LEFT) return false
 
         val leapTo = LeapTarget.getLeap() ?: return false

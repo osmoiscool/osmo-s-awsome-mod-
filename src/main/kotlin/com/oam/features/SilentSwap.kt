@@ -53,6 +53,16 @@ object SilentSwap {
         return true
     }
 
+    fun swapNow(slot: Int, reason: String): Boolean {
+        if (scheduledSwap != -1) {
+            modMessage("[$scheduledCaller] Currently doing $scheduledReason while OAM is trying to $reason")
+            return false
+        }
+        if (slot !in 0..8) return false
+        currentSlot = slot
+        return true
+    }
+
     private fun afterSlotSwapped() {
         if (scheduledSwap == -1) return
 
