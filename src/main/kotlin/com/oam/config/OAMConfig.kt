@@ -41,6 +41,7 @@ class OAMSettings {
 
     var brAuto = false
     var brUseSpiritLeap = false
+    var crystalAuto = false
     var p3Auto = false
     var p5Auto = false
     var p5AutoDelay = 0

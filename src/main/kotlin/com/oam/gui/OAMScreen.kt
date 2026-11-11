@@ -79,6 +79,8 @@ class OAMScreen : Screen(Component.literal("OAM")) {
         Header("Blood Rush"),
         sharedToggle("Door Opener Leap", OAMSettings::brAuto),
         sharedToggle("Use Spirit Leap When Required", OAMSettings::brUseSpiritLeap),
+        Header("Maxor"),
+        sharedToggle("Crystal Pickup Leap", OAMSettings::crystalAuto),
         Header("Storm"),
         sharedToggle("Crush Leap", OAMSettings::stormCrushAuto),
         sharedText("Crush Target", OAMSettings::stormCrushTarget),

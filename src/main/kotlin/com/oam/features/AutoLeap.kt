@@ -28,6 +28,7 @@ object AutoLeap {
 
     fun onChat(message: String) {
         onBrChat(message)
+        onCrystalChat(message)
         onSectionChat(message)
         onRelicChat(message)
         onStormChat(message)
@@ -53,6 +54,14 @@ object AutoLeap {
         LeapTarget.doorOpener = opener
 
         if (config.brAuto) LeapHelper.autoLeap(opener, useSpiritLeapWhenRequired = config.brUseSpiritLeap)
+    }
+
+    private fun onCrystalChat(message: String) {
+        if (!config.crystalAuto) return
+        val me = mc.player?.name?.string ?: return
+        if (message != "$me picked up an Energy Crystal!") return
+        val target = LeapTarget.getLeap() ?: return
+        LeapHelper.autoLeap(target)
     }
 
     private val progressRegex = Regex("""(\w+) (activated|completed) (a terminal|a device|a lever)! \((\d)/(\d)\)""")

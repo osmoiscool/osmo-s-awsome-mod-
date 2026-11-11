@@ -27,7 +27,6 @@ object LeapTarget {
 
     private fun phaseTwoLeap(): String? {
         if (!profile.p2Leap) return null
-        if (!Dungeon.inRegion("p2")) return null
         val target = when {
             config.selectedClass != "Mage" -> profile.p2StormTarget
             Dungeon.stormCrushed -> profile.p2CrushTarget
