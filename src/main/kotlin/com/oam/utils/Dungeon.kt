@@ -33,6 +33,12 @@ object Dungeon {
 
     fun inRegion(name: String): Boolean = regions[name]?.containsPlayer() == true
 
+    fun inP4(): Boolean {
+        if (phase == 0) return false
+        val y = mc.player?.y ?: return false
+        return y > 45.0 && y <= 100.0
+    }
+
     fun inP5(): Boolean {
         if (phase == 0) return false
         val y = mc.player?.y ?: return false

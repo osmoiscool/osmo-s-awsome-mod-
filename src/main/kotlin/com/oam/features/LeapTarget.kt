@@ -96,7 +96,7 @@ object LeapTarget {
         return phaseLeap()?.takeIf { it.isNotBlank() }
     }
 
-    private fun phaseLeap(): String? = if (Dungeon.inP5()) phaseFiveLeap() else when (Dungeon.phase) {
+    private fun phaseLeap(): String? = if (Dungeon.inP5()) phaseFiveLeap() else if (Dungeon.inP4()) phaseFourLeap() else when (Dungeon.phase) {
         0 -> phaseZeroLeap()
         1 -> phaseOneLeap()
         2 -> phaseTwoLeap()
