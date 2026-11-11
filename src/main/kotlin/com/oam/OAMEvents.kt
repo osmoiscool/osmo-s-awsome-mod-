@@ -4,6 +4,7 @@ import com.oam.features.AutoLeap
 import com.oam.features.FastLeap
 import com.oam.features.LeapHelper
 import com.oam.features.LeapRotationFix
+import com.oam.features.LeapTarget
 import net.minecraft.network.protocol.game.ClientboundMapItemDataPacket
 import com.oam.utils.ContainerData
 import com.oam.utils.Dungeon
@@ -29,6 +30,7 @@ object OAMEvents {
             val message = packet.content.string.removeFormatting()
             Dungeon.onChat(message)
             LeapHelper.onChat(message)
+            LeapTarget.onChat(message)
             AutoLeap.onChat(message)
             LeapRotationFix.onChat(message)
         }

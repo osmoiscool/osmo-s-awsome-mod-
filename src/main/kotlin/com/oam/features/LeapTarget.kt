@@ -12,6 +12,35 @@ object LeapTarget {
 
     @Volatile var doorOpener: String? = null
 
+    @Volatile private var p2Step = 0
+    @Volatile private var p5Step = 0
+    @Volatile private var pendingAdvance: (() -> Unit)? = null
+
+    private val teleportedRegex = Regex("""^You have teleported to .+!$""")
+
+    private fun queued(targets: List<String>, step: Int, advance: () -> Unit): String? {
+        val queue = targets.filter { it.isNotBlank() }
+        if (queue.isEmpty()) return null
+        pendingAdvance = advance
+        return resolve(queue[step.coerceAtMost(queue.size - 1)])
+    }
+
+    fun onChat(message: String) {
+        if (teleportedRegex.matches(message)) {
+            pendingAdvance?.invoke()
+            pendingAdvance = null
+        } else if (message.startsWith("This ability is on cooldown for")) {
+            pendingAdvance = null
+        }
+    }
+
+    fun onWorldChange() {
+        doorOpener = null
+        p2Step = 0
+        p5Step = 0
+        pendingAdvance = null
+    }
+
     private fun phaseZeroLeap(): String? {
         if (!profile.brLeap) return null
         return doorOpener
@@ -27,12 +56,11 @@ object LeapTarget {
 
     private fun phaseTwoLeap(): String? {
         if (!profile.p2Leap) return null
-        val target = when {
-            config.selectedClass != "Mage" -> profile.p2StormTarget
-            Dungeon.stormCrushed -> profile.p2CrushTarget
-            else -> profile.p2LightningTarget
-        }
-        return resolve(target)
+        if (config.selectedClass != "Mage") return resolve(profile.p2StormTarget)
+        return queued(
+            listOf(profile.p2InitialTarget, profile.p2LightningTarget, profile.p2CrushTarget),
+            p2Step,
+        ) { p2Step++ }
     }
 
     private fun phaseThreeLeap(): String? {
@@ -58,11 +86,17 @@ object LeapTarget {
 
     private fun phaseFiveLeap(): String? {
         if (!profile.p5Leap) return null
-        if (Dungeon.inRegion("p5")) return resolve(profile.p5Target)
-        return null
+        if (!Dungeon.inP5()) return null
+        if (config.selectedClass != "Mage") return resolve(profile.p5Target)
+        return queued(listOf(profile.p5Target, profile.p5GeneralTarget), p5Step) { p5Step++ }
     }
 
-    fun getLeap(): String? = when (Dungeon.phase) {
+    fun getLeap(): String? {
+        pendingAdvance = null
+        return phaseLeap()?.takeIf { it.isNotBlank() }
+    }
+
+    private fun phaseLeap(): String? = if (Dungeon.inP5()) phaseFiveLeap() else when (Dungeon.phase) {
         0 -> phaseZeroLeap()
         1 -> phaseOneLeap()
         2 -> phaseTwoLeap()
@@ -70,5 +104,5 @@ object LeapTarget {
         4 -> phaseFourLeap()
         5 -> phaseFiveLeap()
         else -> null
-    }?.takeIf { it.isNotBlank() }
+    }
 }

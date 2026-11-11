@@ -58,6 +58,7 @@ class OAMScreen : Screen(Component.literal("OAM")) {
 
     private val stormRows: List<Row> = listOf(text("P2: Storm", FastLeapProfile::p2StormTarget))
     private val mageStormRows: List<Row> = listOf(
+        text("P2: Initial", FastLeapProfile::p2InitialTarget),
         text("P2: After Lightning", FastLeapProfile::p2LightningTarget),
         text("P2: After Crush", FastLeapProfile::p2CrushTarget),
     )
@@ -71,6 +72,11 @@ class OAMScreen : Screen(Component.literal("OAM")) {
         text("P4: Necron Leap", FastLeapProfile::dropTarget),
         text("P4: P5 Leap", FastLeapProfile::midTarget),
         text("P5: Relic", FastLeapProfile::p5Target),
+    )
+
+    private val mageP5Rows: List<Row> = listOf(text("P5: General", FastLeapProfile::p5GeneralTarget))
+
+    private val sharedRows: List<Row> = listOf(
         Header("All Classes"),
         sharedToggle("Leap Rotation Fix", OAMSettings::leapRotationFix),
     )
@@ -103,6 +109,8 @@ class OAMScreen : Screen(Component.literal("OAM")) {
                 addAll(fastTop)
                 addAll(if (settings.selectedClass == "Mage") mageStormRows else stormRows)
                 addAll(fastBottom)
+                if (settings.selectedClass == "Mage") addAll(mageP5Rows)
+                addAll(sharedRows)
             }
             Tab.AUTO -> autoRows
         }

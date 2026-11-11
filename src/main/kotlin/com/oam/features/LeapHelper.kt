@@ -138,7 +138,9 @@ object LeapHelper {
         if (menuOpened) return false
         if (clickedLeap && System.currentTimeMillis() - clickedAt < CLICK_TIMEOUT_MS) return false
 
-        val leapSlot = findLeap()
+        val player = mc.player ?: return false
+        val held = player.mainHandItem
+        val leapSlot = if (held.isInfinileap() || held.isSpiritLeap()) player.inventory.selectedSlot else findLeap()
         if (leapSlot < 0) return false
         if (!swapSlot(leapSlot)) return false
 

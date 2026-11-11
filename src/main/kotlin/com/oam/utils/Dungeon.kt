@@ -33,16 +33,15 @@ object Dungeon {
 
     fun inRegion(name: String): Boolean = regions[name]?.containsPlayer() == true
 
+    fun inP5(): Boolean {
+        if (phase == 0) return false
+        val y = mc.player?.y ?: return false
+        return y <= 45.0
+    }
+
     fun currentRegions(): List<String> = regions.filterValues { it.containsPlayer() }.keys.toList()
 
-    @Volatile
-    var stormCrushed = false
-        private set
-
     fun onChat(message: String) {
-        if (message.contains("[BOSS] Storm: Oof") || message.contains("[BOSS] Storm: Ouch, that hurt!")) {
-            stormCrushed = true
-        }
         phase = when (message) {
             "[BOSS] Maxor: WELL! WELL! WELL! LOOK WHO'S HERE!" -> 1
             "[BOSS] Storm: Pathetic Maxor, just like expected." -> 2
@@ -55,7 +54,6 @@ object Dungeon {
 
     fun onWorldChange() {
         phase = 0
-        stormCrushed = false
         partyCache.clear()
     }
 

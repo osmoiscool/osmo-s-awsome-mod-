@@ -18,6 +18,7 @@ class FastLeapProfile {
 
     var p1Target = "bers"
     var p2StormTarget = ""
+    var p2InitialTarget = ""
     var p2LightningTarget = ""
     var p2CrushTarget = ""
     var ssTarget = "heal"
@@ -28,6 +29,7 @@ class FastLeapProfile {
     var dropTarget = "heal"
     var midTarget = "heal"
     var p5Target = "heal"
+    var p5GeneralTarget = ""
 }
 
 class OAMSettings {
