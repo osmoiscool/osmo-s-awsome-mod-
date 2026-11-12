@@ -92,6 +92,8 @@ class OAMScreen : Screen(Component.literal("OAM")) {
         sharedText("Crush Target", OAMSettings::stormCrushTarget),
         Header("Goldor"),
         sharedToggle("Section Leaps (S1-S4 targets)", OAMSettings::p3Auto),
+        sharedToggle("Auto Leap After SS Completion", OAMSettings::ssCompleteAuto),
+        sharedText("SS Completion Target", OAMSettings::ssCompleteTarget),
         sharedToggle("Bers Leapout (4th device)", OAMSettings::bersLeapoutAuto),
         sharedText("Bers Leapout Target", OAMSettings::bersLeapoutTarget),
         Header("P5"),

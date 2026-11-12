@@ -3,6 +3,7 @@ package com.oam.features
 import com.oam.config.OAMConfig
 import com.oam.utils.Dungeon
 import com.oam.utils.Scheduler
+import com.oam.utils.isPlayerInBox
 import com.oam.utils.mc
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.Packet
@@ -118,6 +119,12 @@ object AutoLeap {
         total = 7
         gateBlown = false
         section = if (section >= 4) 1 else section + 1
+
+        if (finished == 1 && config.ssCompleteAuto && config.ssCompleteTarget.isNotBlank() &&
+            isPlayerInBox(90.5, 110.5, 113.0, 144.0, 52.5, 122.5)) {
+            leapTo(config.ssCompleteTarget)
+            return
+        }
 
         if (!config.p3Auto) return
 

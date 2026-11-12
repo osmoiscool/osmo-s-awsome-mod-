@@ -57,10 +57,9 @@ object LeapTarget {
     private fun phaseTwoLeap(): String? {
         if (!profile.p2Leap) return null
         if (config.selectedClass != "Mage") return resolve(profile.p2StormTarget)
-        return queued(
-            listOf(profile.p2InitialTarget, profile.p2LightningTarget, profile.p2CrushTarget),
-            p2Step,
-        ) { p2Step++ }
+        val targets = mutableListOf(profile.p2InitialTarget, profile.p2LightningTarget, profile.p2CrushTarget)
+        if (profile.p3Leap) targets += profile.ssTarget
+        return queued(targets, p2Step) { p2Step++ }
     }
 
     private fun phaseThreeLeap(): String? {

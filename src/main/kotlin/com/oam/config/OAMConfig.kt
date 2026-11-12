@@ -45,6 +45,8 @@ class OAMSettings {
     var brUseSpiritLeap = false
     var crystalAuto = false
     var p3Auto = false
+    var ssCompleteAuto = false
+    var ssCompleteTarget = ""
     var p5Auto = false
     var p5AutoDelay = 0
     var stormCrushAuto = false
