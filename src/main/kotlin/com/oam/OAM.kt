@@ -63,6 +63,15 @@ object OAM : ClientModInitializer {
                             else party.forEach { (n, c) -> modMessage("&b$n &7- &f$c") }
                             1
                         })
+                        .then(ClientCommands.literal("debug").executes {
+                            val p = mc.player
+                            val profile = OAMConfig.settings.profile
+                            modMessage("&7Class: &b${OAMConfig.settings.selectedClass} &7Phase: &b${Dungeon.phase} &7Y: &b${p?.y?.let { "%.1f".format(it) }}")
+                            modMessage("&7inP4: &b${Dungeon.inP4()} &7inP5: &b${Dungeon.inP5()} &7Regions: &b${Dungeon.currentRegions()}")
+                            modMessage("&7Necron toggle: &b${profile.p4Leap} &7Drop: &b${profile.dropTarget} &7Mid: &b${profile.midTarget}")
+                            modMessage("&7Fast leap target: &b${LeapTarget.getLeap()}")
+                            1
+                        })
                 )
             }
         }

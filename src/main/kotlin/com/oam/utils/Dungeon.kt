@@ -26,7 +26,6 @@ object Dungeon {
         "s2" to box(19, 111, 106, 146, 121, 145),
         "s3" to box(-6, 20, 106, 146, 50, 143),
         "s4" to box(-2, 89, 106, 152, 30, 51),
-        "drop" to box(36, 73, 58, 96, 95, 122),
         "mid" to box(46, 63, 58, 96, 68, 85),
         "p5" to box(14, 99, 5, 8, 52, 134),
     )
@@ -48,11 +47,14 @@ object Dungeon {
     fun currentRegions(): List<String> = regions.filterValues { it.containsPlayer() }.keys.toList()
 
     fun onChat(message: String) {
+        if (message.startsWith("[BOSS] Goldor: You have done it, you destroyed the factory")) {
+            phase = 4
+            return
+        }
         phase = when (message) {
             "[BOSS] Maxor: WELL! WELL! WELL! LOOK WHO'S HERE!" -> 1
             "[BOSS] Storm: Pathetic Maxor, just like expected." -> 2
             "[BOSS] Storm: I should have known that I stood no chance." -> 3
-            "[BOSS] Necron: You went further than any human before, congratulations." -> 4
             "[BOSS] Necron: All this, for nothing..." -> 5
             else -> return
         }

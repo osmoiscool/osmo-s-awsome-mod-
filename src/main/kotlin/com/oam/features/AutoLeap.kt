@@ -57,12 +57,14 @@ object AutoLeap {
         if (config.brAuto) LeapHelper.autoLeap(opener, useSpiritLeapWhenRequired = config.brUseSpiritLeap)
     }
 
+    private val crystalRegex = Regex("""^(?:\[[^\]]+] )?(\w+) picked up an Energy Crystal!$""")
+
     private fun onCrystalChat(message: String) {
         if (!config.crystalAuto) return
         val me = mc.player?.name?.string ?: return
-        if (message != "$me picked up an Energy Crystal!") return
-        val target = LeapTarget.getLeap() ?: return
-        LeapHelper.autoLeap(target)
+        val picker = crystalRegex.find(message)?.groupValues?.get(1) ?: return
+        if (picker != me) return
+        leapTo(config.profile.p1Target)
     }
 
     private val progressRegex = Regex("""(\w+) (activated|completed) (a terminal|a device|a lever)! \((\d)/(\d)\)""")

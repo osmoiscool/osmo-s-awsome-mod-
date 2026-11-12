@@ -77,8 +77,8 @@ object LeapTarget {
     private fun phaseFourLeap(): String? {
         if (!profile.p4Leap) return null
         return when {
-            Dungeon.inRegion("drop") -> resolve(profile.dropTarget)
             Dungeon.inRegion("mid") -> resolve(profile.midTarget)
+            Dungeon.phase >= 4 -> resolve(profile.dropTarget)
             else -> null
         }
     }
@@ -95,7 +95,7 @@ object LeapTarget {
         return phaseLeap()?.takeIf { it.isNotBlank() }
     }
 
-    private fun phaseLeap(): String? = if (Dungeon.inP5()) phaseFiveLeap() else if (Dungeon.inP4()) phaseFourLeap() else when (Dungeon.phase) {
+    private fun phaseLeap(): String? = if (Dungeon.inP5()) phaseFiveLeap() else if (Dungeon.phase >= 4 || Dungeon.inP4()) phaseFourLeap() else when (Dungeon.phase) {
         0 -> phaseZeroLeap()
         1 -> phaseOneLeap()
         2 -> phaseTwoLeap()
