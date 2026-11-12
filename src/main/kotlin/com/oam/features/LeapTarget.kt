@@ -86,7 +86,7 @@ object LeapTarget {
     private fun phaseFiveLeap(): String? {
         if (!profile.p5Leap) return null
         if (!Dungeon.inP5()) return null
-        if (config.selectedClass != "Mage") return resolve(profile.p5Target)
+        if (config.selectedClass != "Mage" && config.selectedClass != "Tank") return resolve(profile.p5Target)
         return queued(listOf(profile.p5Target, profile.p5GeneralTarget), p5Step) { p5Step++ }
     }
 

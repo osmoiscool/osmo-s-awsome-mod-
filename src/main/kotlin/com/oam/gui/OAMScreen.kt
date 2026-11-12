@@ -111,7 +111,7 @@ class OAMScreen : Screen(Component.literal("OAM")) {
                 addAll(fastTop)
                 addAll(if (settings.selectedClass == "Mage") mageStormRows else stormRows)
                 addAll(fastBottom)
-                if (settings.selectedClass == "Mage") addAll(mageP5Rows)
+                if (settings.selectedClass == "Mage" || settings.selectedClass == "Tank") addAll(mageP5Rows)
                 addAll(sharedRows)
             }
             Tab.AUTO -> autoRows
