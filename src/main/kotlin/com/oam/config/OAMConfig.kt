@@ -21,6 +21,7 @@ class FastLeapProfile {
     var p2InitialTarget = ""
     var p2LightningTarget = ""
     var p2CrushTarget = ""
+    var pdTarget = "arch"
     var ssTarget = "heal"
     var s1Target = "mage"
     var s2Target = "heal"

@@ -56,6 +56,7 @@ object LeapTarget {
 
     private fun phaseTwoLeap(): String? {
         if (!profile.p2Leap) return null
+        if (config.selectedClass == "Healer" && Dungeon.inRegion("s3")) return resolve(profile.pdTarget)
         if (config.selectedClass != "Mage") return resolve(profile.p2StormTarget)
         val targets = mutableListOf(profile.p2InitialTarget, profile.p2LightningTarget, profile.p2CrushTarget)
         if (profile.p3Leap) targets += profile.ssTarget
@@ -95,7 +96,7 @@ object LeapTarget {
         return phaseLeap()?.takeIf { it.isNotBlank() }
     }
 
-    private fun phaseLeap(): String? = if (Dungeon.inP5()) phaseFiveLeap() else if (Dungeon.phase >= 4 || Dungeon.inP4()) phaseFourLeap() else when (Dungeon.phase) {
+    private fun phaseLeap(): String? = if (Dungeon.phase <= 1 && Dungeon.inRegion("p1")) phaseOneLeap() else if (Dungeon.inP5()) phaseFiveLeap() else if (Dungeon.phase >= 4 || Dungeon.inP4()) phaseFourLeap() else when (Dungeon.phase) {
         0 -> phaseZeroLeap()
         1 -> phaseOneLeap()
         2 -> phaseTwoLeap()

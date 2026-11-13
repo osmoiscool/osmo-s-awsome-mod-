@@ -63,6 +63,8 @@ class OAMScreen : Screen(Component.literal("OAM")) {
         text("P2: After Crush", FastLeapProfile::p2CrushTarget),
     )
 
+    private val healerStormRows: List<Row> = listOf(text("P2: Predev", FastLeapProfile::pdTarget))
+
     private val fastBottom: List<Row> = listOf(
         text("P3: SS Leap", FastLeapProfile::ssTarget),
         text("P3: S1", FastLeapProfile::s1Target),
@@ -110,6 +112,7 @@ class OAMScreen : Screen(Component.literal("OAM")) {
                 if (expanded === classDropdown) addAll(classOptions)
                 addAll(fastTop)
                 addAll(if (settings.selectedClass == "Mage") mageStormRows else stormRows)
+                if (settings.selectedClass == "Healer") addAll(healerStormRows)
                 addAll(fastBottom)
                 if (settings.selectedClass == "Mage" || settings.selectedClass == "Tank") addAll(mageP5Rows)
                 addAll(sharedRows)
