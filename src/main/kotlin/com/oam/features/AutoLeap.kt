@@ -79,6 +79,7 @@ object AutoLeap {
         total = 7
         gateBlown = false
         section = 1
+        melodyPlayer = null
     }
 
     private fun onSectionChat(message: String) {
@@ -120,6 +121,7 @@ object AutoLeap {
         progress = 0
         total = 7
         gateBlown = false
+        melodyPlayer = null
         section = if (section >= 4) 1 else section + 1
 
         if (finished == 1 && config.ssCompleteAuto && config.ssCompleteTarget.isNotBlank() &&
@@ -179,11 +181,27 @@ object AutoLeap {
 
     private fun triggerBers() {
         bersDone = true
+        val melody = melodyPlayer?.takeIf { config.bersMelodyLeap }
+        melodyPlayer = null
         val target = config.bersLeapoutTarget
-        Scheduler.afterTicks(1) { leapTo(target) }
+        Scheduler.afterTicks(1) {
+            if (melody != null) LeapHelper.autoLeap(melody) else leapTo(target)
+        }
+    }
+
+    private val melodyRegex = Regex("""Party\s*>\s*(?:\[.*?]\s*)?([^:]+):\s*.*(?:[mM][eE][lL][oO][dD][yY]|1/3|33%).*""")
+
+    @Volatile private var melodyPlayer: String? = null
+
+    private fun onMelodyChat(message: String) {
+        if (!config.bersLeapoutAuto || !config.bersMelodyLeap || bersDone || Dungeon.phase != 3) return
+        val name = melodyRegex.find(message)?.groupValues?.get(1)?.trim() ?: return
+        if (name.isEmpty() || name == mc.player?.name?.string) return
+        melodyPlayer = name
     }
 
     private fun onBersChat(message: String) {
+        onMelodyChat(message)
         if (!bersReady()) return
         val name = deviceCompleteRegex.find(message)?.groupValues?.get(1) ?: return
         if (name == mc.player?.name?.string) triggerBers()

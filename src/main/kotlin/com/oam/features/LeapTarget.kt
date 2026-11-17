@@ -25,7 +25,28 @@ object LeapTarget {
         return resolve(queue[step.coerceAtMost(queue.size - 1)])
     }
 
+    private const val NECRON_LEAP_DELAY_MS = 2000L
+    @Volatile private var coreOpenedAt = 0L
+
+    private fun necronLeapReady(): Boolean =
+        coreOpenedAt != 0L && System.currentTimeMillis() - coreOpenedAt >= NECRON_LEAP_DELAY_MS
+
+    private const val SS_LEAP_DELAY_MS = 3000L
+    @Volatile private var stormCrushedAt = 0L
+
+    private fun ssLeapReady(): Boolean =
+        stormCrushedAt != 0L && System.currentTimeMillis() - stormCrushedAt >= SS_LEAP_DELAY_MS
+
     fun onChat(message: String) {
+        if (stormCrushedAt == 0L &&
+            (message.contains("[BOSS] Storm: Oof") || message.contains("[BOSS] Storm: Ouch, that hurt!"))) {
+            stormCrushedAt = System.currentTimeMillis()
+            return
+        }
+        if (message == "The Core entrance is opening!") {
+            coreOpenedAt = System.currentTimeMillis()
+            return
+        }
         if (teleportedRegex.matches(message)) {
             pendingAdvance?.invoke()
             pendingAdvance = null
@@ -39,6 +60,8 @@ object LeapTarget {
         p2Step = 0
         p5Step = 0
         pendingAdvance = null
+        coreOpenedAt = 0L
+        stormCrushedAt = 0L
     }
 
     private fun phaseZeroLeap(): String? {
@@ -55,6 +78,7 @@ object LeapTarget {
     }
 
     private fun phaseTwoLeap(): String? {
+        if (profile.p3Leap && ssLeapReady()) return resolve(profile.ssTarget)
         if (!profile.p2Leap) return null
         if (config.selectedClass == "Healer" && Dungeon.inRegion("s3")) return resolve(profile.pdTarget)
         if (config.selectedClass != "Mage") return resolve(profile.p2StormTarget)
@@ -79,7 +103,7 @@ object LeapTarget {
         if (!profile.p4Leap) return null
         return when {
             Dungeon.inRegion("mid") -> resolve(profile.midTarget)
-            Dungeon.phase >= 4 -> resolve(profile.dropTarget)
+            necronLeapReady() || Dungeon.phase >= 4 -> resolve(profile.dropTarget)
             else -> null
         }
     }
@@ -91,12 +115,27 @@ object LeapTarget {
         return queued(listOf(profile.p5Target, profile.p5GeneralTarget), p5Step) { p5Step++ }
     }
 
+    fun getSlLeap(): String? {
+        if (!profile.slFastLeap) return null
+        if (Dungeon.phase != 3 || Dungeon.inP5() || Dungeon.inP4() || necronLeapReady()) return null
+        val target = when {
+            Dungeon.inRegion("s1") -> profile.slS1Target
+            Dungeon.inRegion("s2") -> profile.slS2Target
+            Dungeon.inRegion("s3") -> profile.slS3Target
+            Dungeon.inRegion("s4") -> profile.slS4Target
+            else -> return null
+        }
+        if (target.isBlank()) return null
+        pendingAdvance = null
+        return resolve(target).takeIf { it.isNotBlank() }
+    }
+
     fun getLeap(): String? {
         pendingAdvance = null
         return phaseLeap()?.takeIf { it.isNotBlank() }
     }
 
-    private fun phaseLeap(): String? = if (Dungeon.phase <= 1 && Dungeon.inRegion("p1")) phaseOneLeap() else if (Dungeon.inP5()) phaseFiveLeap() else if (Dungeon.phase >= 4 || Dungeon.inP4()) phaseFourLeap() else when (Dungeon.phase) {
+    private fun phaseLeap(): String? = if (Dungeon.phase <= 1 && Dungeon.inRegion("p1")) phaseOneLeap() else if (Dungeon.inP5()) phaseFiveLeap() else if (necronLeapReady() || Dungeon.phase >= 4 || Dungeon.inP4()) phaseFourLeap() else when (Dungeon.phase) {
         0 -> phaseZeroLeap()
         1 -> phaseOneLeap()
         2 -> phaseTwoLeap()

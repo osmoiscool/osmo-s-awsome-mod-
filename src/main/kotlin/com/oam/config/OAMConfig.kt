@@ -31,6 +31,12 @@ class FastLeapProfile {
     var midTarget = "heal"
     var p5Target = "heal"
     var p5GeneralTarget = ""
+
+    var slFastLeap = false
+    var slS1Target = ""
+    var slS2Target = ""
+    var slS3Target = ""
+    var slS4Target = ""
 }
 
 class OAMSettings {
@@ -54,6 +60,7 @@ class OAMSettings {
     var stormCrushTarget = ""
     var bersLeapoutAuto = false
     var bersLeapoutTarget = ""
+    var bersMelodyLeap = false
 }
 
 object OAMConfig {

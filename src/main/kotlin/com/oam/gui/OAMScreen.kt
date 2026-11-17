@@ -42,9 +42,21 @@ class OAMScreen : Screen(Component.literal("OAM")) {
     private val classDropdown = Dropdown("Class", { settings.selectedClass }, { settings.selectedClass = it }, OAMConfig.CLASSES)
     private val classOptions = classDropdown.options.map { Option(classDropdown, it) }
 
-    private val fastTop: List<Row> = listOf(
+    private val fastGeneral: List<Row> = listOf(
         Header("General"),
         toggle("Fast Leap", FastLeapProfile::fastLeap),
+        toggle("SL Fast Leap", FastLeapProfile::slFastLeap),
+    )
+
+    private val slRows: List<Row> = listOf(
+        Header("Spirit Leap Targets"),
+        text("S1", FastLeapProfile::slS1Target),
+        text("S2", FastLeapProfile::slS2Target),
+        text("S3", FastLeapProfile::slS3Target),
+        text("S4", FastLeapProfile::slS4Target),
+    )
+
+    private val fastTop: List<Row> = listOf(
         Header("Phases"),
         toggle("Blood Rush", FastLeapProfile::brLeap),
         toggle("Maxor", FastLeapProfile::p1Leap),
@@ -83,7 +95,7 @@ class OAMScreen : Screen(Component.literal("OAM")) {
         sharedToggle("Leap Rotation Fix", OAMSettings::leapRotationFix),
     )
 
-    private val autoRows: List<Row> = listOf(
+    private val autoTop: List<Row> = listOf(
         Header("Blood Rush"),
         sharedToggle("Door Opener Leap", OAMSettings::brAuto),
         sharedToggle("Use Spirit Leap When Required", OAMSettings::brUseSpiritLeap),
@@ -97,6 +109,11 @@ class OAMScreen : Screen(Component.literal("OAM")) {
         sharedToggle("Auto Leap After SS Completion", OAMSettings::ssCompleteAuto),
         sharedText("SS Completion Target", OAMSettings::ssCompleteTarget),
         sharedToggle("Bers Leapout (4th device)", OAMSettings::bersLeapoutAuto),
+    )
+
+    private val bersMelodyRow: Row = sharedToggle("  Melody Leap (overrides target)", OAMSettings::bersMelodyLeap)
+
+    private val autoBottom: List<Row> = listOf(
         sharedText("Bers Leapout Target", OAMSettings::bersLeapoutTarget),
         Header("P5"),
         sharedToggle("Relic Leap (P5 Relic target)", OAMSettings::p5Auto),
@@ -110,14 +127,22 @@ class OAMScreen : Screen(Component.literal("OAM")) {
             Tab.FAST -> buildList {
                 add(classDropdown)
                 if (expanded === classDropdown) addAll(classOptions)
-                addAll(fastTop)
-                addAll(if (settings.selectedClass == "Mage") mageStormRows else stormRows)
-                if (settings.selectedClass == "Healer") addAll(healerStormRows)
-                addAll(fastBottom)
-                if (settings.selectedClass == "Mage" || settings.selectedClass == "Tank") addAll(mageP5Rows)
+                addAll(fastGeneral)
+                if (settings.profile.fastLeap) {
+                    addAll(fastTop)
+                    addAll(if (settings.selectedClass == "Mage") mageStormRows else stormRows)
+                    if (settings.selectedClass == "Healer") addAll(healerStormRows)
+                    addAll(fastBottom)
+                    if (settings.selectedClass == "Mage" || settings.selectedClass == "Tank") addAll(mageP5Rows)
+                }
+                if (settings.profile.slFastLeap) addAll(slRows)
                 addAll(sharedRows)
             }
-            Tab.AUTO -> autoRows
+            Tab.AUTO -> buildList {
+                addAll(autoTop)
+                if (settings.bersLeapoutAuto) add(bersMelodyRow)
+                addAll(autoBottom)
+            }
         }
 
     private val rowHeight = 16
@@ -333,6 +358,7 @@ class OAMScreen : Screen(Component.literal("OAM")) {
             }
             is Toggle -> {
                 row.set(!row.get())
+                scroll = scroll.coerceIn(0, maxScroll)
                 OAMConfig.save()
                 return true
             }

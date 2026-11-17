@@ -20,8 +20,16 @@ object FastLeap {
             return false
         }
 
-        if (!OAMConfig.settings.profile.fastLeap) return false
         if (button != LEFT) return false
+
+        if (heldSkyblockId() == "SPIRIT_LEAP") {
+            LeapTarget.getSlLeap()?.let {
+                LeapHelper.leap(it)
+                return true
+            }
+        }
+
+        if (!OAMConfig.settings.profile.fastLeap) return false
 
         val leapTo = LeapTarget.getLeap() ?: return false
 
