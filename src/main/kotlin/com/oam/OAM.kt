@@ -3,7 +3,6 @@ package com.oam
 import com.oam.config.OAMConfig
 import com.oam.features.AutoLeap
 import com.oam.features.LeapHelper
-import com.oam.features.LeapRotationFix
 import com.oam.features.LeapTarget
 import com.oam.features.SilentSwap
 import com.oam.utils.Scheduler
@@ -31,7 +30,6 @@ object OAM : ClientModInitializer {
             Dungeon.onWorldChange()
             AutoLeap.onWorldChange()
             LeapTarget.onWorldChange()
-            LeapRotationFix.onWorldChange()
             LeapHelper.reset()
             SilentSwap.reset()
             ContainerData.reset()

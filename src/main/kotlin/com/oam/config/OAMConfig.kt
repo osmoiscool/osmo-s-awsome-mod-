@@ -46,8 +46,6 @@ class OAMSettings {
     val profile: FastLeapProfile
         get() = classProfiles.getOrPut(selectedClass) { FastLeapProfile() }
 
-    var leapRotationFix = false
-
     var brAuto = false
     var brUseSpiritLeap = false
     var crystalAuto = false

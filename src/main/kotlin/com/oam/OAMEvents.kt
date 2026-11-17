@@ -3,9 +3,7 @@ package com.oam
 import com.oam.features.AutoLeap
 import com.oam.features.FastLeap
 import com.oam.features.LeapHelper
-import com.oam.features.LeapRotationFix
 import com.oam.features.LeapTarget
-import net.minecraft.network.protocol.game.ClientboundMapItemDataPacket
 import com.oam.utils.ContainerData
 import com.oam.utils.Dungeon
 import com.oam.utils.mc
@@ -32,9 +30,7 @@ object OAMEvents {
             LeapHelper.onChat(message)
             LeapTarget.onChat(message)
             AutoLeap.onChat(message)
-            LeapRotationFix.onChat(message)
         }
-        if (packet is ClientboundMapItemDataPacket) LeapRotationFix.onMapData(packet)
         AutoLeap.onPacketReceive(packet)
         if (packet is ClientboundPlayerInfoUpdatePacket) {
             val lines = packet.entries().mapNotNull { it.displayName?.string }

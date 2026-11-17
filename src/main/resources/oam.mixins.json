@@ -13,7 +13,6 @@
     "MixinHud",
     "MixinFirstPersonHandsAndItems",
     "MixinMultiPlayerGameMode",
-    "MixinClientPacketListener",
     "accessors.IMultiPlayerGameModeAccessor"
   ],
   "injectors": {

@@ -198,7 +198,6 @@ object LeapHelper {
             if (item.isEmpty) continue
             if (item.hoverName.string.removeFormatting().lowercase() != target.lowercase()) continue
 
-            LeapRotationFix.onHiddenClick(slot, item)
             ContainerData.windowClick(slot, ContainerInput.CLONE)
             modMessage("&7Leaping to &b$target")
             this.target = null

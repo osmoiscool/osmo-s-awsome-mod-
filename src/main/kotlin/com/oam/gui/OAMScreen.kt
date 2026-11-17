@@ -90,11 +90,6 @@ class OAMScreen : Screen(Component.literal("OAM")) {
 
     private val mageP5Rows: List<Row> = listOf(text("P5: General", FastLeapProfile::p5GeneralTarget))
 
-    private val sharedRows: List<Row> = listOf(
-        Header("All Classes"),
-        sharedToggle("Leap Rotation Fix", OAMSettings::leapRotationFix),
-    )
-
     private val autoTop: List<Row> = listOf(
         Header("Blood Rush"),
         sharedToggle("Door Opener Leap", OAMSettings::brAuto),
@@ -111,7 +106,7 @@ class OAMScreen : Screen(Component.literal("OAM")) {
         sharedToggle("Bers Leapout (4th device)", OAMSettings::bersLeapoutAuto),
     )
 
-    private val bersMelodyRow: Row = sharedToggle("  Melody Leap (overrides target)", OAMSettings::bersMelodyLeap)
+    private val bersMelodyRow: Row = sharedToggle("  Melody Leap", OAMSettings::bersMelodyLeap)
 
     private val autoBottom: List<Row> = listOf(
         sharedText("Bers Leapout Target", OAMSettings::bersLeapoutTarget),
@@ -136,7 +131,6 @@ class OAMScreen : Screen(Component.literal("OAM")) {
                     if (settings.selectedClass == "Mage" || settings.selectedClass == "Tank") addAll(mageP5Rows)
                 }
                 if (settings.profile.slFastLeap) addAll(slRows)
-                addAll(sharedRows)
             }
             Tab.AUTO -> buildList {
                 addAll(autoTop)
