@@ -101,6 +101,18 @@ class OAMScreen : Screen(Component.literal("OAM")) {
         sharedText("Crush Target", OAMSettings::stormCrushTarget),
         Header("Goldor"),
         sharedToggle("Section Leaps (S1-S4 targets)", OAMSettings::p3Auto),
+    )
+
+    private val sectionEditRow: Row = sharedToggle("  Edit Triggered Sections", OAMSettings::p3EditSections)
+
+    private val sectionRows: List<Row> = listOf(
+        sharedToggle("    S1", OAMSettings::p3AutoS1),
+        sharedToggle("    S2", OAMSettings::p3AutoS2),
+        sharedToggle("    S3", OAMSettings::p3AutoS3),
+        sharedToggle("    S4", OAMSettings::p3AutoS4),
+    )
+
+    private val autoMid: List<Row> = listOf(
         sharedToggle("Auto Leap After SS Completion", OAMSettings::ssCompleteAuto),
         sharedText("SS Completion Target", OAMSettings::ssCompleteTarget),
         sharedToggle("Bers Leapout (4th device)", OAMSettings::bersLeapoutAuto),
@@ -134,6 +146,11 @@ class OAMScreen : Screen(Component.literal("OAM")) {
             }
             Tab.AUTO -> buildList {
                 addAll(autoTop)
+                if (settings.p3Auto) {
+                    add(sectionEditRow)
+                    if (settings.p3EditSections) addAll(sectionRows)
+                }
+                addAll(autoMid)
                 if (settings.bersLeapoutAuto) add(bersMelodyRow)
                 addAll(autoBottom)
             }

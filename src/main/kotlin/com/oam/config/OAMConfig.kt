@@ -50,6 +50,11 @@ class OAMSettings {
     var brUseSpiritLeap = false
     var crystalAuto = false
     var p3Auto = false
+    var p3EditSections = false
+    var p3AutoS1 = true
+    var p3AutoS2 = true
+    var p3AutoS3 = true
+    var p3AutoS4 = true
     var ssCompleteAuto = false
     var ssCompleteTarget = ""
     var p5Auto = false

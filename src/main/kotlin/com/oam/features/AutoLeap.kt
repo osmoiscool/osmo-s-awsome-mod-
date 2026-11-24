@@ -131,6 +131,7 @@ object AutoLeap {
         }
 
         if (!config.p3Auto) return
+        if (!sectionEnabled(finished)) return
 
         val target = when (finished) {
             1 -> if (Dungeon.inRegion("s1")) config.profile.s1Target else null
@@ -141,6 +142,17 @@ object AutoLeap {
         } ?: return
 
         leapTo(target)
+    }
+
+    private fun sectionEnabled(section: Int): Boolean {
+        if (!config.p3EditSections) return true
+        return when (section) {
+            1 -> config.p3AutoS1
+            2 -> config.p3AutoS2
+            3 -> config.p3AutoS3
+            4 -> config.p3AutoS4
+            else -> false
+        }
     }
 
     private val relicRegex = Regex("""(\w+) picked the Corrupted \w+ Relic!""")
